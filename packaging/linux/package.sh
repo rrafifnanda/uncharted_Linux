@@ -41,8 +41,16 @@ strip --strip-debug -o "$dest/bin/gpu/libbbgpu.so" out/gpu/libbbgpu.so
 # Libraries every desktop and SteamOS have, or that must match the graphics driver, stay out
 # (whole families: libX*, libdrm_*, libpulse*, ...).
 system='^(ld-linux|libc\.|libm\.|libdl\.|libpthread|librt\.|libresolv|libutil\.|libgcc_s|libstdc\+\+|libvulkan|libX|libxcb|libxkb|libwayland|libdrm|libGL|libEGL|libgbm|libva[.-]|libva-|libasound|libpulse|libpipewire|libdbus|libudev|libsystemd|libz\.|libzstd|libexpat|libelf|libLLVM|libffi|libcap\.|libgcrypt|libgpg-error|liblzma|libmount|libblkid|libglib|libgobject|libgio|libgmodule|libpcre2|libdecor|libxshmfence|libsensors|libfontconfig|libfreetype)'
-ldd out/bb-probe out/gpu/libbbgpu.so out/bb-gpu-capabilities | awk '/=> \// {print $1, $3}' | sort -u |
-    while read -r name path; do
+# Arch/CachyOS: the dynamic loader is listed as "/lib64/ld-linux-... => /usr/lib64/ld-linux-..."
+# (on Debian it has no left side), and the resolved paths may contain spaces, since the checkout
+# can live in a directory with one. So take everything up to the "(0x...)" trailer: the library
+# name always comes from the resolved path, and the loader counts as a system library.
+missing=$(ldd out/bb-probe out/gpu/libbbgpu.so out/bb-gpu-capabilities | grep 'not found' || true)
+[[ -z $missing ]] || { echo "Libraries not found:" >&2; echo "$missing" >&2; exit 1; }
+ldd out/bb-probe out/gpu/libbbgpu.so out/bb-gpu-capabilities |
+    sed -n 's|.*=> \(/.*\) (0x[0-9a-f]*)$|\1|p' | sort -u |
+    while read -r path; do
+        name=$(basename "$path")
         [[ $name =~ $system ]] || cp -L "$path" "$dest/bin/lib/$name"
     done
 cp scripts/prepare.py scripts/link_modules.py scripts/link_libc.py scripts/content_profile.py "$dest/scripts/"
