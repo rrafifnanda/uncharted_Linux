@@ -48,8 +48,8 @@ if not WINDOWS:  # Linux fork: its own releases (the Linux builds), tagged v<ups
         VERSION = (PORT_DIR / 'LINUX_BUILD').read_text().strip() or VERSION
     except OSError:
         pass
-    RELEASES_API = 'https://api.github.com/repos/spacepepperoni/uncharted_Linux/releases/latest'
-    RELEASES_PAGE = 'https://github.com/spacepepperoni/uncharted_Linux/releases/latest'
+    RELEASES_API = 'https://api.github.com/repos/rrafifnanda/uncharted_Linux/releases/latest'
+    RELEASES_PAGE = 'https://github.com/rrafifnanda/uncharted_Linux/releases/latest'
 UPDATE_DIR = Path(tempfile.gettempdir()) / 'uncharted-update'
 # Never copied over an installation by an update (the package does not hold them either).
 USER_FILES = ('user', 'out', 'art', 'bbport.ini', 'input.ini', 'last_run.log')

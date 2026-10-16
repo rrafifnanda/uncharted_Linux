@@ -235,7 +235,7 @@ def steam_command(steam, launcher_file, game):
     return str(exe), options
 
 
-REPO_URL = 'https://github.com/spacepepperoni/uncharted_Linux'
+REPO_URL = 'https://github.com/rrafifnanda/uncharted_Linux'
 
 
 def icon_image(name, size, color, background):

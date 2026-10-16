@@ -1,12 +1,12 @@
 #!/bin/sh
 # Installs (or updates) Uncharted: The Nathan Drake Collection for Linux/Steam Deck:
-#   curl -fsSL https://raw.githubusercontent.com/spacepepperoni/uncharted_Linux/main/install.sh | sh
+#   curl -fsSL https://raw.githubusercontent.com/rrafifnanda/uncharted_Linux/main/install.sh | sh
 # The latest release's AppImage goes to ~/Applications, with an application menu entry and a
 # desktop icon. Saves and settings live in ~/.local/share/uncharted-linux and are never touched.
 # `sh install.sh --uninstall` removes the AppImage and the menu entry (saves are kept).
 set -eu
 
-repo=spacepepperoni/uncharted_Linux
+repo=rrafifnanda/uncharted_Linux
 apps="$HOME/Applications"
 appimage="$apps/Uncharted-x86_64.AppImage"
 data="${XDG_DATA_HOME:-$HOME/.local/share}"

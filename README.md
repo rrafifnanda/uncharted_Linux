@@ -5,6 +5,8 @@
 
 **Uncharted 1, 2 and 3 from the PS4 collection running natively on Linux, forked by spacepepperoni from [SuperMedo](https://github.com/Supermedo).**
 
+**This repository is rrafifnanda's own build of that fork: it follows the Linux fork's sources automatically (a scheduled workflow merges upstream every 6 hours and only lands a merge whose Linux build passes) and publishes its own releases, which the launcher's update check uses. Build and run notes for Arch/CachyOS are in [docs/LINUX_CACHYOS.md](docs/LINUX_CACHYOS.md).**
+
 **This client is a launcher that allows you to directly launch Uncharted 1-3, add to your desktop or add to your Steam Library. This fork features auto-updates, a modified save system and a Steam Deck mode that optimizes playback for Steam Deck.**
 <img width="700" height="500" alt="image" src="https://github.com/user-attachments/assets/361582f1-7221-4f99-9a67-1748343836ad" />
 
@@ -18,22 +20,22 @@
 ## Install
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/spacepepperoni/uncharted_Linux/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/rrafifnanda/uncharted_Linux/main/install.sh | sh
 ```
 
 ## Uninstall
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/spacepepperoni/uncharted_Linux/main/install.sh | sh -s -- --uninstall
+curl -fsSL https://raw.githubusercontent.com/rrafifnanda/uncharted_Linux/main/install.sh | sh -s -- --uninstall
 ```
 
 ## Appimage
-1. Download **[Uncharted-x86_64.AppImage](https://github.com/spacepepperoni/uncharted_Linux/releases/latest/download/Uncharted-x86_64.AppImage)**.
+1. Download **[Uncharted-x86_64.AppImage](https://github.com/rrafifnanda/uncharted_Linux/releases/latest/download/Uncharted-x86_64.AppImage)**.
 2. Right-click it, open **Properties → Permissions** and tick **Is executable** (or
    **Allow executing file as program**).
 
 ## Steam Deck
-- For Steam Deck, it is recommended to install the [.AppImage](https://github.com/spacepepperoni/uncharted_Linux/releases/latest/download/Uncharted-x86_64.AppImage) and add the games to Steam to play in Game Mode. 
+- For Steam Deck, it is recommended to install the [.AppImage](https://github.com/rrafifnanda/uncharted_Linux/releases/latest/download/Uncharted-x86_64.AppImage) and add the games to Steam to play in Game Mode. 
 - In the Display tab, a Steam Deck mode is auto-selected if you are on SteamOS. With this enabled, expect an average of 25-30fps with occasional dips during demanding segments.
 - It is recommended to set your FPS cap to 30fps on the Steam Deck power menu.
 
