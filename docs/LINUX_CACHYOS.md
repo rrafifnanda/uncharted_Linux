@@ -91,8 +91,14 @@ found (on this machine that folder does not exist yet, Steam has not been signed
 1. A push or the scheduled sync lands on `main`; `build.yml` publishes `v0.3.3-linux.<n>`.
 2. The launcher reads `LINUX_BUILD` from inside its own AppImage, asks
    `api.github.com/repos/rrafifnanda/uncharted_Linux/releases/latest` and offers that update.
+   In the launcher window it is *offered* (the Update button downloads it, checks the download,
+   renames it into place and restarts); games started from Steam (`--play`) install it in the
+   background instead, because Gaming Mode never opens the launcher window.
 3. To absorb upstream by hand: **Actions → Sync with upstream → Run workflow**.
 4. A merge that conflicts or fails its build never reaches `main`; it arrives as a pull request.
+
+A locally built AppImage has an empty `LINUX_BUILD`, so it counts as `0.3.3` and the first release
+counts as newer – that is how a local build gets the self-updating release build in one click.
 
 ## Fixes this copy carries over the upstream fork
 
