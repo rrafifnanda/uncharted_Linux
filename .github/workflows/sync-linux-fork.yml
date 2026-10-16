@@ -1,0 +1,114 @@
+# Keeps this fork up to date with the Linux fork it was forked from
+# (spacepepperoni/uncharted_Linux: the launcher, packaging and port work). Upstream's main is
+# merged into linux-merge, the Linux build runs on that, and only a passing merge reaches main
+# (which then publishes a release). README.md is this fork's own: when both sides changed it, this
+# fork's version is kept. A conflict or a failing build opens a pull request instead; main is not
+# touched. Its schedule is offset half an hour from sync-upstream.yml, whose land step shares the
+# land-main concurrency group so the two never push to main at the same time.
+name: Sync with the Linux fork
+
+on:
+  schedule:
+    - cron: '47 */6 * * *'
+  workflow_dispatch:
+    inputs:  # for testing the workflow against another source; normally left as they are
+      repo:
+        description: Linux fork repository
+        default: spacepepperoni/uncharted_Linux
+      branch:
+        description: Linux fork branch
+        default: main
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
+concurrency:
+  group: sync-linux-fork
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    outputs:
+      result: ${{ steps.merge.outputs.result }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Merge the Linux fork into linux-merge
+        id: merge
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          repo=${{ inputs.repo || 'spacepepperoni/uncharted_Linux' }}
+          branch=${{ inputs.branch || 'main' }}
+          git remote add linuxfork "https://github.com/$repo.git"
+          git fetch linuxfork "$branch:refs/remotes/linuxfork/main"
+          if git merge-base --is-ancestor linuxfork/main HEAD; then
+            echo 'Already up to date.'; echo 'result=current' >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          git checkout -B linux-merge
+          if ! git merge --no-edit -m "Merge $repo" linuxfork/main; then
+            git checkout --ours README.md 2>/dev/null && git add README.md || true
+            if [ -n "$(git diff --name-only --diff-filter=U)" ]; then
+              files=$(git diff --name-only --diff-filter=U | sed 's/^/- /')
+              git merge --abort
+              if [ -z "$(gh pr list --head linux-merge --base main --state open --json number -q '.[].number')" ]; then
+                gh pr create --head linux-merge --base main --title 'Linux fork changes need a manual merge' \
+                  --body "Merging $repo into main conflicts in:
+          $files
+
+          Resolve the conflicts in this pull request, then merge it."
+              fi
+              echo 'result=conflict' >> "$GITHUB_OUTPUT"; exit 0
+            fi
+            git commit --no-edit
+          fi
+          git push --force origin HEAD:refs/heads/linux-merge
+          echo 'result=merged' >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: merge
+    if: needs.merge.outputs.result == 'merged'
+    uses: ./.github/workflows/build.yml
+    with:
+      ref: linux-merge
+
+  land:
+    needs: [merge, build]
+    if: always() && needs.merge.outputs.result == 'merged'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: land-main  # shared with sync-upstream.yml: one landing at a time
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Put the merge on main, or open a pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BUILD: ${{ needs.build.result }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch origin linux-merge
+          if [ "$BUILD" = success ]; then
+            # main may have moved while the build ran (README edits): merge, keeping its README.
+            if git merge --no-edit origin/linux-merge || { git checkout --ours README.md && git add README.md && git commit --no-edit; }; then
+              git push origin HEAD:main
+              git push origin --delete linux-merge || true  # staging only; main has it now
+              gh workflow run build.yml --ref main
+              exit 0
+            fi
+          fi
+          if [ -z "$(gh pr list --head linux-merge --base main --state open --json number -q '.[].number')" ]; then
+            gh pr create --head linux-merge --base main --title 'Linux fork changes break the Linux build' \
+              --body "The latest spacepepperoni/uncharted_Linux changes merge cleanly but the Linux build failed (build result: $BUILD), so main was left as it is. See the Sync with the Linux fork run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID. Fix the build on the linux-merge branch, then merge this pull request."
+          fi
+          exit 1

@@ -8,6 +8,10 @@ self-built AppImage that updates itself from here instead of waiting for someone
 - `sync-upstream.yml` merges `Supermedo/uncharted_pc` into this fork every 6 hours, builds the merge
   and only lands it on `main` when the Linux build passes; on a conflict or a failing build it
   opens a pull request and leaves `main` alone.
+- `sync-linux-fork.yml` does the same with `spacepepperoni/uncharted_Linux`, the Linux fork this one
+  was forked from, so its launcher and packaging work flows in as well. It runs 6-hourly, offset by
+  half an hour, and both landing steps share one concurrency group so they never push to `main` at
+  the same time.
 - `build.yml` builds `main` in a Debian 13 container and publishes a release tagged
   `v<version>-linux.<run>`, which is exactly what the launcher's update check looks for.
 
@@ -94,7 +98,8 @@ found (on this machine that folder does not exist yet, Steam has not been signed
    In the launcher window it is *offered* (the Update button downloads it, checks the download,
    renames it into place and restarts); games started from Steam (`--play`) install it in the
    background instead, because Gaming Mode never opens the launcher window.
-3. To absorb upstream by hand: **Actions → Sync with upstream → Run workflow**.
+3. To absorb a source by hand: **Actions → Sync with upstream** (SuperMedo) or **Sync with the
+   Linux fork** (spacepepperoni), each with **Run workflow**.
 4. A merge that conflicts or fails its build never reaches `main`; it arrives as a pull request.
 
 A locally built AppImage has an empty `LINUX_BUILD`, so it counts as `0.3.3` and the first release

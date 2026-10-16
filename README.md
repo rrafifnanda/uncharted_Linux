@@ -5,7 +5,7 @@
 
 **Uncharted 1, 2 and 3 from the PS4 collection running natively on Linux, forked by spacepepperoni from [SuperMedo](https://github.com/Supermedo).**
 
-**This repository is rrafifnanda's own build of that fork: it follows the Linux fork's sources automatically (a scheduled workflow merges upstream every 6 hours and only lands a merge whose Linux build passes) and publishes its own releases, which the launcher's update check uses. Build and run notes for Arch/CachyOS are in [docs/LINUX_CACHYOS.md](docs/LINUX_CACHYOS.md).**
+**This repository is rrafifnanda's own build of that fork: it follows both the game upstream ([SuperMedo/uncharted_pc](https://github.com/SuperMedo/uncharted_pc)) and the Linux fork it is based on ([spacepepperoni/uncharted_Linux](https://github.com/spacepepperoni/uncharted_Linux)) with scheduled workflows that merge each, build the merge and only land it when the Linux build passes (a conflict or a failing build becomes a pull request instead). Every landing publishes a release, which the launcher's update check uses. Build and run notes for Arch/CachyOS are in [docs/LINUX_CACHYOS.md](docs/LINUX_CACHYOS.md).**
 
 **This client is a launcher that allows you to directly launch Uncharted 1-3, add to your desktop or add to your Steam Library. This fork features auto-updates, a modified save system and a Steam Deck mode that optimizes playback for Steam Deck.**
 <img width="700" height="500" alt="image" src="https://github.com/user-attachments/assets/361582f1-7221-4f99-9a67-1748343836ad" />

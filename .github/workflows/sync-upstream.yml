@@ -53,7 +53,7 @@ jobs:
             echo 'Already up to date.'; echo 'result=current' >> "$GITHUB_OUTPUT"; exit 0
           fi
           git checkout -B upstream-merge
-          if ! git merge --no-edit -m 'Merge upstream Supermedo/uncharted_pc' upstream/main; then
+          if ! git merge --no-edit -m "Merge $repo" upstream/main; then
             git checkout --ours README.md 2>/dev/null && git add README.md || true
             if [ -n "$(git diff --name-only --diff-filter=U)" ]; then
               files=$(git diff --name-only --diff-filter=U | sed 's/^/- /')
@@ -83,6 +83,9 @@ jobs:
     needs: [merge, build]
     if: always() && needs.merge.outputs.result == 'merged'
     runs-on: ubuntu-latest
+    concurrency:
+      group: land-main  # shared with sync-linux-fork.yml: one landing at a time
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
         with:
