@@ -5,6 +5,16 @@
 
 static int capture;
 int bbgpu_overlay_captures_input(void) { return capture; }
+/* Mouse look lives in the GPU library, which is not linked here: no mouse input, no capture. */
+void bbgpu_mouse_configure(int look) { (void)look; }
+int bbgpu_camera_yaw(float *yaw_degrees, double *age_seconds) {
+    (void)yaw_degrees; (void)age_seconds;
+    return 0;
+}
+int bbgpu_mouse_sample(float *dx, float *dy, uint32_t *buttons, int *wheel) {
+    (void)dx; (void)dy; (void)buttons; (void)wheel;
+    return 0;
+}
 uintptr_t runtime_lookup(const RuntimeExport *table, size_t count, const char *name) {
     (void)table; (void)count; (void)name;
     return 0;
@@ -24,6 +34,9 @@ int main(void) {
     assert(fd>=0);
     close(fd);
     setenv("BB_PAD_FILE",path,1);
+    /* The SDL section below drives a virtual controller: with BB_PAD_HOST the scripted pad file is
+     * applied on top of the controller instead of replacing it (a scripted run ignores it). */
+    setenv("BB_PAD_HOST","1",1);
     setenv("SDL_VIDEODRIVER","dummy",1);
     /* Only the virtual test controller is a gamepad, whatever is plugged in. */
     SDL_SetHint(SDL_HINT_GAMECONTROLLER_IGNORE_DEVICES_EXCEPT,"0x1d50/0x6189");
