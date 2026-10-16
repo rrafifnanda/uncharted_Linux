@@ -43,15 +43,19 @@ BB_LTO=OFF BB_JOBS=3 bash build.sh
 - `BB_LTO=OFF`: link-time optimization needs far more memory than this machine has. Leave it on
   elsewhere for a faster binary.
 
-Unit tests and the Vulkan smoke test (neither needs a game dump):
+Unit tests and the Vulkan smoke tests (none of them needs a game dump):
 
 ```sh
 BB_LTO=OFF BB_JOBS=3 bash build.sh --test        # pad, runtime, file-mods, sema, content
 ./out/bb-gpu-capabilities --live-resolution      # prints the Vulkan device in use
+./out/bb-probe --vulkan-only                     # command submission + 4 KiB readback
 ```
 
-On this machine the smoke test prints
-`GPU: AMD Radeon Graphics (RADV RENOIR), integrated or other, 3285 MiB: live resolution changes off`.
+On this machine they print
+`GPU: AMD Radeon Graphics (RADV RENOIR), integrated or other, 3285 MiB: live resolution changes off`
+and `Vulkan: AMD Radeon Graphics (RADV RENOIR); command submission + 4096-byte readback PASS`.
+Both also pass with the binaries of the released AppImage (extract it with
+`--appimage-extract`, then run `bin/bb-probe --vulkan-only`), which is the portable Debian 13 build.
 
 ## Package and install
 
